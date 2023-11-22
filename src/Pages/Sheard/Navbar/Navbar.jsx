@@ -1,17 +1,74 @@
+import { useContext } from "react";
 import { Link } from "react-router-dom";
+import { AuthContext } from "../../../providers/AuthProvider";
+import { FaCartShopping } from "react-icons/fa6";
+import useCarts from "../../../hooks/useCarts";
+import useAdmin from "../../../hooks/useAdmin";
 
-const Navbar = () => {
+const NavBar = () => {
+  const { user, logOut } = useContext(AuthContext);
+  const [isAdmin]=useAdmin();
+  const [cart]=useCarts()
 
-  const navOptions =
+  const handleLogOut = () => {
+    logOut()
+      .then(() => {})
+      .catch((error) => console.log(error));
+  };
+
+  const navOptions = (
     <>
-    <li><Link to="/">Home</Link></li>
-    <li><Link to="/menu">Our Menu</Link></li>
-    <li><Link to="/order/salad">Order Food</Link></li>
+      <li>
+        <Link to="/">Home</Link>
+      </li>
+      <li>
+        <Link to="/menu">Our Menu</Link>
+      </li>
+      <li>
+        <Link to="/order/salad">Order Food</Link>
+      </li>
+     
+      {
+        user && isAdmin && <li>
+        <Link to="/dashboard/adminHome">Dashboard</Link>
+      </li>
+      }
+      {
+        user && isAdmin && <li>
+        <Link to="/dashboard/userHome">Dashboard</Link>
+      </li>
+      }
+      <li>
+        <Link to="/dashboard/cart">
+          <button className="flex items-center gap-3 bg-gray-500 py-1 px-3 rounded">
+            <FaCartShopping />
+
+            <div className="badge badge-secondary">+{cart.length}</div>
+          </button>
+        </Link>
+      </li>
+
+      {user ? (
+        <>
+          {/* <span>{user?.displayName}</span> */}
+          <li>
+            {" "}
+            <Link onClick={handleLogOut}>LogOut</Link>
+          </li>
+        </>
+      ) : (
+        <>
+          <li>
+            <Link to="/login">Login</Link>
+          </li>
+        </>
+      )}
     </>
-  
+  );
+
   return (
     <>
-      <div className="navbar fixed z-10 bg-opacity-30 text-white  bg-slate-950 max-w-screen-xl p-3">
+      <div className="navbar fixed z-10 bg-opacity-30 max-w-screen-xl bg-black text-white">
         <div className="navbar-start">
           <div className="dropdown">
             <label tabIndex={0} className="btn btn-ghost lg:hidden">
@@ -32,29 +89,22 @@ const Navbar = () => {
             </label>
             <ul
               tabIndex={0}
-              className="menu menu-sm dropdown-content mt-3 z-[1] p-2 shadow bg-base-100 rounded-box w-52"
+              className="menu menu-compact dropdown-content mt-3 p-2 shadow bg-base-100 rounded-box w-52"
             >
-             {navOptions}
+              {navOptions}
             </ul>
           </div>
-          <div>
-            <h2 className=" text-3xl font-bold  text-red-500">BISTRO BOSS</h2>
-            <h2 className=" text-xl font-semibold font-serif text-white">
-            Restaurant
-            </h2>
-          </div>
+          <a className="btn btn-ghost normal-case text-xl">Bistro Boss</a>
         </div>
         <div className="navbar-center hidden lg:flex">
-          <ul className="menu menu-horizontal px-1">
-           {navOptions}
-          </ul>
+          <ul className="menu menu-horizontal px-1">{navOptions}</ul>
         </div>
         <div className="navbar-end">
-          <a className="btn">Button</a>
+          <a className="btn">Get started</a>
         </div>
       </div>
     </>
   );
 };
 
-export default Navbar;
+export default NavBar;
